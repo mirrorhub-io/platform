@@ -1,0 +1,184 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "controllers/proto/api.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/contacts": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoContact"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoContact"
+            }
+          }
+        ],
+        "tags": [
+          "ContactService"
+        ]
+      }
+    },
+    "/v1/mirrors": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoMirrorGetResponse"
+            }
+          }
+        },
+        "tags": [
+          "MirrorService"
+        ]
+      },
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        ],
+        "tags": [
+          "MirrorService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protoContact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "protoMirror": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "ipv4": {
+          "type": "string",
+          "format": "string"
+        },
+        "ipv6": {
+          "type": "string",
+          "format": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "int64"
+        },
+        "online_since": {
+          "type": "string",
+          "format": "int64"
+        },
+        "bandwidth": {
+          "type": "string",
+          "format": "int64"
+        },
+        "traffic": {
+          "type": "string",
+          "format": "int64"
+        },
+        "location": {
+          "type": "string",
+          "format": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/protoMirrorType"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "contact_id": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "protoMirrorGetRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "offset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "protoMirrorGetResponse": {
+      "type": "object",
+      "properties": {
+        "mirrors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoMirror"
+          }
+        }
+      }
+    },
+    "protoMirrorType": {
+      "type": "string",
+      "enum": [
+        "OFFER",
+        "PETITION"
+      ],
+      "default": "OFFER"
+    }
+  }
+}
