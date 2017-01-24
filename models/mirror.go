@@ -26,6 +26,24 @@ type Mirror struct {
 	Services []Service `gorm:"many2many:services_mirrors;"`
 }
 
+type MirrorCollection struct {
+	Mirrors []*Mirror
+}
+
+func MirrorList(limit int, offset int) *MirrorCollection {
+	mirrors := make([]*Mirror, 0)
+	Connection().Find(&mirrors)
+	return &MirrorCollection{Mirrors: mirrors}
+}
+
+func (mc *MirrorCollection) ToProto() []*pb.Mirror {
+	mirrors := make([]*pb.Mirror, len(mc.Mirrors))
+	for i, mirror := range mc.Mirrors {
+		mirrors[i] = mirror.ToProto()
+	}
+	return mirrors
+}
+
 func (m *Mirror) ToProto() *pb.Mirror {
 	return &pb.Mirror{
 		Name:        m.Name,
