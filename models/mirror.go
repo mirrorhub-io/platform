@@ -35,19 +35,3 @@ func (m *Mirror) ToProto() *pb.Mirror {
 		OnlineSince: time.Now().Unix(),
 	}
 }
-
-type Service struct {
-	gorm.Model
-
-	Name               string
-	Storage            int64
-	TrafficConsumption int64
-}
-
-type Contact struct {
-	gorm.Model
-
-	Name    string
-	EMail   string
-	Mirrors []Mirror
-}
