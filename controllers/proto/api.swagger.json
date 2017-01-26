@@ -80,6 +80,46 @@
           "MirrorService"
         ]
       }
+    },
+    "/v1/services": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoServiceGetResponse"
+            }
+          }
+        },
+        "tags": [
+          "ServiceService"
+        ]
+      },
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoService"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoService"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -88,7 +128,7 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int32"
+          "format": "int64"
         },
         "name": {
           "type": "string",
@@ -103,9 +143,13 @@
     "protoMirror": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "format": "string"
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "contact_id": {
+          "type": "integer",
+          "format": "int32"
         },
         "ipv4": {
           "type": "string",
@@ -115,11 +159,19 @@
           "type": "string",
           "format": "string"
         },
-        "created_at": {
+        "name": {
           "type": "string",
-          "format": "int64"
+          "format": "string"
         },
-        "online_since": {
+        "domain": {
+          "type": "string",
+          "format": "string"
+        },
+        "client_token": {
+          "type": "string",
+          "format": "string"
+        },
+        "created_at": {
           "type": "string",
           "format": "int64"
         },
@@ -131,20 +183,15 @@
           "type": "string",
           "format": "int64"
         },
-        "location": {
+        "available_storage": {
           "type": "string",
-          "format": "string"
+          "format": "int64"
         },
-        "type": {
-          "$ref": "#/definitions/protoMirrorType"
-        },
-        "id": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "contact_id": {
-          "type": "integer",
-          "format": "int32"
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoService"
+          }
         }
       }
     },
@@ -172,13 +219,50 @@
         }
       }
     },
-    "protoMirrorType": {
-      "type": "string",
-      "enum": [
-        "OFFER",
-        "PETITION"
-      ],
-      "default": "OFFER"
+    "protoService": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "storage": {
+          "type": "string",
+          "format": "int64"
+        },
+        "traffic_consumption": {
+          "type": "string",
+          "format": "int64"
+        }
+      }
+    },
+    "protoServiceGetRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "offset": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "protoServiceGetResponse": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoService"
+          }
+        }
+      }
     }
   }
 }

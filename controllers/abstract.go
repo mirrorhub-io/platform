@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	pb "./proto"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"net"

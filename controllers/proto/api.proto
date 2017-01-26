@@ -27,10 +27,18 @@ service MirrorService {
   }
 }
 
-message Contact {
-  int32 id = 1;
-  string name = 2;
-  string email = 3;
+service ServiceService {
+  rpc Get(ServiceGetRequest) returns (ServiceGetResponse) {
+    option (google.api.http) = {
+      get: "/v1/services"
+    };
+  }
+  rpc Create(Service) returns (Service) {
+    option (google.api.http) = {
+      post: "/v1/services",
+      body: "*"
+    };
+  }
 }
 
 message MirrorGetRequest {
@@ -42,21 +50,40 @@ message MirrorGetResponse {
   repeated Mirror mirrors = 1;
 }
 
+message ServiceGetRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ServiceGetResponse {
+  repeated Service services = 1;  
+}
+
+message Contact {
+  int32 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message Service {
+  int32 id = 1;
+  string name = 2;
+  int64 storage = 3;
+  int64 traffic_consumption = 4;
+}
+
 message Mirror {
-  string name = 1;
-  string ipv4 = 2;
-  string ipv6 = 3;
-  int64 created_at = 4;
-  int64 online_since = 5;
-  int64 bandwidth = 6;
-  int64 traffic = 7;
-  string location = 8;
-  enum Type {
-    OFFER = 0;
-    PETITION = 1;
-  }
-  Type type = 9;
-  int32 id = 10;
-  int32 contact_id = 11;
+  int32 id = 1;
+  int32 contact_id = 2;
+  string ipv4 = 3;
+  string ipv6 = 4;
+  string name = 5;
+  string domain = 6;
+  string client_token = 7;
+  int64 created_at = 8;
+  int64 bandwidth = 9;
+  int64 traffic = 10;
+  int64 available_storage = 11;
+  repeated Service services = 12;
 }
 

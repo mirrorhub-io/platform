@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	models "../models"
-	pb "./proto"
+	pb "github.com/mirrorhub-io/platform/controllers/proto"
+	"github.com/mirrorhub-io/platform/models"
 	"golang.org/x/net/context"
 )
 
@@ -16,11 +16,7 @@ func (m *mirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequ
 }
 
 func (m *mirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
-	x := models.Mirror{
-		Name: mirror.Name,
-		IPv4: mirror.Ipv4,
-		IPv6: mirror.Ipv6,
-	}
+	x := models.MirrorFromProto(mirror)
 	models.Connection().Create(&x)
 	return x.ToProto(), nil
 }
