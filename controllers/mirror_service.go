@@ -3,7 +3,6 @@ package controllers
 import (
 	models "../models"
 	pb "./proto"
-	log "github.com/Sirupsen/logrus"
 	"golang.org/x/net/context"
 )
 
