@@ -72,7 +72,7 @@ message Contact {
   int32 id = 1;
   string name = 2;
   string email = 3;
-  bool admin = 4
+  bool admin = 4;
 }
 
 message Service {
