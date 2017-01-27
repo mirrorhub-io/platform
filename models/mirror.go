@@ -69,7 +69,6 @@ func (m *Mirror) ToProto() *pb.Mirror {
 		Name:        m.Name,
 		Ipv4:        m.IPv4,
 		Ipv6:        m.IPv6,
-		Services:    m.FetchServices().ToProto(),
 		Domain:      m.Domain,
 		ContactId:   m.ContactID,
 		Traffic:     m.Traffic,

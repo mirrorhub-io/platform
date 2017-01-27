@@ -21,6 +21,10 @@ func (m *mirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequ
 	}, err
 }
 
+func (m *mirrorServiceServer) Find(ctx context.Context, request *pb.MirrorFindRequest) (*pb.Mirror, error) {
+	return &pb.Mirror{}, nil
+}
+
 func (m *mirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
 	x := models.MirrorFromProto(mirror)
 	models.Connection().Create(&x)
