@@ -8,20 +8,21 @@ import (
 type Mirror struct {
 	gorm.Model
 
-	ContactID int32
-	IPv4      string `gorm:"not null;unique"`
-	IPv6      string `gorm:"unique"`
-	Domain    string `gorm:"not null;unique"`
-	Name      string
+	ContactID        int32
+	IPv4             string `gorm:"not null"`
+	IPv6             string `gorm:"not null"`
+	Domain           string `gorm:"not null"`
+	LocalDestination string `gorm:"not null"`
+	Name             string `gorm:"not null"`
 
-	Traffic          int64
-	TrafficResetDay  int32
-	Bandwidth        int64
-	AvailableStorage int64
+	Traffic   int64
+	Bandwidth int64
+	Storage   int64
 
 	ClientToken string `gorm:"not null;unique"`
 
-	Services []Service `gorm:"many2many:services_mirrors;"`
+	ServiceEnpointID int32
+	ServiceID        int32
 }
 
 type MirrorCollection struct {
@@ -36,15 +37,14 @@ func MirrorList(limit int, offset int) *MirrorCollection {
 
 func MirrorFromProto(p *pb.Mirror) *Mirror {
 	return &Mirror{
-		Name:             p.Name,
-		IPv4:             p.Ipv4,
-		IPv6:             p.Ipv6,
-		Domain:           p.Domain,
-		ContactID:        p.ContactId,
-		Traffic:          p.Traffic,
-		AvailableStorage: p.AvailableStorage,
-		ClientToken:      p.ClientToken,
-		Bandwidth:        p.Bandwidth,
+		Name:        p.Name,
+		IPv4:        p.Ipv4,
+		IPv6:        p.Ipv6,
+		Domain:      p.Domain,
+		ContactID:   p.ContactId,
+		Traffic:     p.Traffic,
+		ClientToken: p.ClientToken,
+		Bandwidth:   p.Bandwidth,
 	}
 }
 
@@ -66,16 +66,15 @@ func (m *Mirror) FetchServices() *ServiceCollection {
 
 func (m *Mirror) ToProto() *pb.Mirror {
 	return &pb.Mirror{
-		Name:             m.Name,
-		Ipv4:             m.IPv4,
-		Ipv6:             m.IPv6,
-		Services:         m.FetchServices().ToProto(),
-		Domain:           m.Domain,
-		ContactId:        m.ContactID,
-		Traffic:          m.Traffic,
-		AvailableStorage: m.AvailableStorage,
-		ClientToken:      m.ClientToken,
-		Bandwidth:        m.Bandwidth,
-		CreatedAt:        m.CreatedAt.Unix(),
+		Name:        m.Name,
+		Ipv4:        m.IPv4,
+		Ipv6:        m.IPv6,
+		Services:    m.FetchServices().ToProto(),
+		Domain:      m.Domain,
+		ContactId:   m.ContactID,
+		Traffic:     m.Traffic,
+		ClientToken: m.ClientToken,
+		Bandwidth:   m.Bandwidth,
+		CreatedAt:   m.CreatedAt.Unix(),
 	}
 }

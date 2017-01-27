@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
+	"github.com/mirrorhub-io/platform/models"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"net"
 	"net/http"
 )
@@ -22,4 +25,42 @@ func StartServer() {
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterMirrorServiceServer(grpcServer, new(mirrorServiceServer))
 	grpcServer.Serve(lis)
+}
+
+func AuthContact(ctx context.Context) (*models.Contact, string) {
+	md, _ := metadata.FromContext(ctx)
+	log.Info(md)
+	if md["contactemail"] == nil {
+		return nil, ""
+	}
+	if md["contactpassword"] == nil {
+		if md["contacttoken"] == nil {
+			return nil, ""
+		}
+		return models.AuthContactWithToken(
+			md["contactemail"][0],
+			md["contacttoken"][0],
+		)
+	}
+	return models.AuthContactWithPassword(
+		md["contactemail"][0],
+		md["contactpassword"][0],
+	)
+}
+
+func AuthMirror(ctx context.Context) *models.Mirror {
+	md, _ := metadata.FromContext(ctx)
+	log.Info(md)
+	if md["clienttoken"] == nil {
+		return nil
+	}
+	mirror := &models.Mirror{}
+	models.Connection().Where(
+		"client_token = ?",
+		md["clienttoken"][0],
+	).First(&mirror)
+	if models.Connection().NewRecord(mirror) {
+		return nil
+	}
+	return mirror
 }

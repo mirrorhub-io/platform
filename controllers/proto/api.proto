@@ -19,6 +19,11 @@ service MirrorService {
       get: "/v1/mirrors"
     };
   }
+  rpc Find(MirrorFindRequest) returns (Mirror) {
+    option (google.api.http) = {
+      get: "/v1/mirrors/{client_token}"
+    };
+  }
   rpc Create(Mirror) returns (Mirror) {
     option (google.api.http) = {
       post: "/v1/mirrors",
@@ -39,6 +44,10 @@ service ServiceService {
       body: "*"
     };
   }
+}
+
+message MirrorFindRequest {
+  string client_token = 1;  
 }
 
 message MirrorGetRequest {
@@ -63,6 +72,7 @@ message Contact {
   int32 id = 1;
   string name = 2;
   string email = 3;
+  bool admin = 4
 }
 
 message Service {
@@ -84,6 +94,8 @@ message Mirror {
   int64 bandwidth = 9;
   int64 traffic = 10;
   int64 available_storage = 11;
-  repeated Service services = 12;
+  Service service = 12;
+  Mirror service_endpoint = 13;
+  string local_destination = 14;
 }
 
