@@ -19,11 +19,13 @@ func StartServer() {
 	mux := runtime.NewServeMux()
 	mopts := []grpc.DialOption{grpc.WithInsecure()}
 	pb.RegisterMirrorServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
+	pb.RegisterContactServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
 	go http.ListenAndServe(":8080", mux)
 	lis, _ := net.Listen("tcp", ":9000")
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterMirrorServiceServer(grpcServer, new(mirrorServiceServer))
+	pb.RegisterMirrorServiceServer(grpcServer, new(MirrorServiceServer))
+	pb.RegisterContactServiceServer(grpcServer, new(ContactServiceServer))
 	grpcServer.Serve(lis)
 }
 
@@ -33,18 +35,12 @@ func AuthContact(ctx context.Context) (*models.Contact, string) {
 	if md["contactemail"] == nil {
 		return nil, ""
 	}
-	if md["contactpassword"] == nil {
-		if md["contacttoken"] == nil {
-			return nil, ""
-		}
-		return models.AuthContactWithToken(
-			md["contactemail"][0],
-			md["contacttoken"][0],
-		)
+	if md["contacttoken"] == nil {
+		return nil, ""
 	}
-	return models.AuthContactWithPassword(
+	return models.AuthContactWithToken(
 		md["contactemail"][0],
-		md["contactpassword"][0],
+		md["contacttoken"][0],
 	)
 }
 

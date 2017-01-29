@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
+	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	redis "gopkg.in/redis.v5"
@@ -72,7 +73,14 @@ func AuthContactWithPassword(email, password string) (*Contact, string) {
 	return c, val
 }
 
-func CreateContact(name, email, password string) *Contact {
+func (c *Contact) ToProto() *pb.Contact {
+	return &pb.Contact{
+		Name:  c.Name,
+		Email: c.EMail,
+	}
+}
+
+func CreateContact(name, email, password string) (*Contact, string) {
 	pw, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 	c := &Contact{
 		Name:           name,
@@ -82,8 +90,8 @@ func CreateContact(name, email, password string) *Contact {
 	}
 	Connection().Create(&c)
 	if Connection().NewRecord(c) {
-		return nil
+		return nil, ""
 	}
-	c.GenerateToken()
-	return c
+	token := c.GenerateToken()
+	return c, token
 }

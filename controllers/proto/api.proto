@@ -5,12 +5,33 @@ package proto;
 import "google/api/annotations.proto";
 
 service ContactService {
-  rpc Create(Contact) returns (Contact) {
+  rpc Create(Contact) returns (CreateContactResponse) {
     option (google.api.http) = {
       post: "/v1/contacts",
       body: "*"
     };
   }
+  rpc Authorize(AuthorizeContactRequest) returns (AuthorizeContactResponse) {
+    option (google.api.http) = {
+      post: "/v1/contacts/auth",
+      body: "*"
+    };
+  }
+}
+
+message CreateContactResponse {
+  string token = 1;
+  Contact contact = 2;
+}
+
+message AuthorizeContactResponse {
+  string email = 1;
+  string token = 2;
+}
+
+message AuthorizeContactRequest {
+  string email = 1;
+  string password = 2;
 }
 
 service MirrorService {
@@ -72,7 +93,8 @@ message Contact {
   int32 id = 1;
   string name = 2;
   string email = 3;
-  bool admin = 4;
+  string password = 4;
+  bool admin = 5;
 }
 
 message Service {

@@ -7,10 +7,10 @@ import (
 	"golang.org/x/net/context"
 )
 
-type mirrorServiceServer struct {
+type MirrorServiceServer struct {
 }
 
-func (m *mirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
+func (m *MirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
 	_, err := auth(ctx)
 	mirrors := make([]*pb.Mirror, 0)
 	if err == nil {
@@ -21,11 +21,11 @@ func (m *mirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequ
 	}, err
 }
 
-func (m *mirrorServiceServer) Find(ctx context.Context, request *pb.MirrorFindRequest) (*pb.Mirror, error) {
+func (m *MirrorServiceServer) Find(ctx context.Context, request *pb.MirrorFindRequest) (*pb.Mirror, error) {
 	return &pb.Mirror{}, nil
 }
 
-func (m *mirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
+func (m *MirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
 	x := models.MirrorFromProto(mirror)
 	models.Connection().Create(&x)
 	return x.ToProto(), nil

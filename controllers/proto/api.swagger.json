@@ -22,7 +22,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/protoContact"
+              "$ref": "#/definitions/protoCreateContactResponse"
             }
           }
         },
@@ -33,6 +33,32 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/protoContact"
+            }
+          }
+        ],
+        "tags": [
+          "ContactService"
+        ]
+      }
+    },
+    "/v1/contacts/auth": {
+      "post": {
+        "operationId": "Authorize",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoAuthorizeContactResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoAuthorizeContactRequest"
             }
           }
         ],
@@ -148,6 +174,32 @@
     }
   },
   "definitions": {
+    "protoAuthorizeContactRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "string"
+        },
+        "password": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "protoAuthorizeContactResponse": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "string"
+        },
+        "token": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
     "protoContact": {
       "type": "object",
       "properties": {
@@ -163,9 +215,25 @@
           "type": "string",
           "format": "string"
         },
+        "password": {
+          "type": "string",
+          "format": "string"
+        },
         "admin": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "protoCreateContactResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "format": "string"
+        },
+        "contact": {
+          "$ref": "#/definitions/protoContact"
         }
       }
     },
