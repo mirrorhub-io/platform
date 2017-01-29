@@ -1,6 +1,7 @@
 # Mirrorhub.io Platform
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/mirrorhub-io/platform)](https://goreportcard.com/report/github.com/mirrorhub-io/platform)
+[![Docker Repository on Quay](https://quay.io/repository/mirrorhub/platform/status "Docker Repository on Quay")](https://quay.io/repository/mirrorhub/platform)
 
 **Coming soon**
 
