@@ -7,8 +7,7 @@ import (
 )
 
 func main() {
-	models.Connection()
-	log.Info("Connection should be open.")
+	log.Info("Starting server.")
 	controllers.StartServer()
 	defer models.Connection().Close()
 }
