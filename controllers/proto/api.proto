@@ -42,7 +42,7 @@ service MirrorService {
   }
   rpc Find(MirrorFindRequest) returns (Mirror) {
     option (google.api.http) = {
-      get: "/v1/mirrors/{client_token}"
+      get: "/v1/mirrors/self"
     };
   }
   rpc Create(Mirror) returns (Mirror) {

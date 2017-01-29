@@ -10,13 +10,10 @@ import (
 type MirrorServiceServer struct {
 }
 
-func (m *MirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
-	contact, _, err := AuthContact(ctx)
-	if err != nil {
+func (m *MirrorServiceServer) Get(ctx context.Context,
+	request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
+	if err := contactAuth(ctx); err != nil {
 		return nil, err
-	}
-	if contact == nil {
-		return nil, errors.New("Unauthorized")
 	}
 	mirrors := make([]*pb.Mirror, 0)
 	mirrors = models.MirrorList(10, 0).ToProto()
@@ -25,20 +22,31 @@ func (m *MirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequ
 	}, nil
 }
 
-func (m *MirrorServiceServer) Find(ctx context.Context, request *pb.MirrorFindRequest) (*pb.Mirror, error) {
-	return &pb.Mirror{}, nil
+func (m *MirrorServiceServer) Find(ctx context.Context,
+	request *pb.MirrorFindRequest) (*pb.Mirror, error) {
+	mirror, err := AuthMirror(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return mirror.ToProto(), nil
 }
 
 func (m *MirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
+	if err := contactAuth(ctx); err != nil {
+		return nil, err
+	}
 	x := models.MirrorFromProto(mirror)
 	models.Connection().Create(&x)
 	return x.ToProto(), nil
 }
 
-func auth(ctx context.Context) (*models.Mirror, error) {
-	mirror := AuthMirror(ctx)
-	if mirror != nil {
-		return mirror, nil
+func contactAuth(ctx context.Context) error {
+	contact, _, err := AuthContact(ctx)
+	if err != nil {
+		return err
 	}
-	return mirror, errors.New("Unauthorized")
+	if contact == nil {
+		return errors.New("Unauthorized")
+	}
+	return nil
 }

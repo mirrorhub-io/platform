@@ -47,11 +47,10 @@ func AuthContact(ctx context.Context) (*models.Contact, string, error) {
 	return contact, token, nil
 }
 
-func AuthMirror(ctx context.Context) *models.Mirror {
+func AuthMirror(ctx context.Context) (*models.Mirror, error) {
 	md, _ := metadata.FromContext(ctx)
-	log.Info(md)
 	if md["clienttoken"] == nil {
-		return nil
+		return nil, errors.New("Client token missing")
 	}
 	mirror := &models.Mirror{}
 	models.Connection().Where(
@@ -59,7 +58,7 @@ func AuthMirror(ctx context.Context) *models.Mirror {
 		md["clienttoken"][0],
 	).First(&mirror)
 	if models.Connection().NewRecord(mirror) {
-		return nil
+		return nil, errors.New("No mirror found.")
 	}
-	return mirror
+	return mirror, nil
 }
