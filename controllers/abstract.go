@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	log "github.com/Sirupsen/logrus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
@@ -29,19 +30,21 @@ func StartServer() {
 	grpcServer.Serve(lis)
 }
 
-func AuthContact(ctx context.Context) (*models.Contact, string) {
+func AuthContact(ctx context.Context) (*models.Contact, string, error) {
 	md, _ := metadata.FromContext(ctx)
-	log.Info(md)
 	if md["contactemail"] == nil {
-		return nil, ""
+		log.Debug("Email missing")
+		return nil, "", errors.New("Email missing")
 	}
 	if md["contacttoken"] == nil {
-		return nil, ""
+		log.Debug("Token missing")
+		return nil, "", errors.New("Token missing")
 	}
-	return models.AuthContactWithToken(
+	contact, token := models.AuthContactWithToken(
 		md["contactemail"][0],
 		md["contacttoken"][0],
 	)
+	return contact, token, nil
 }
 
 func AuthMirror(ctx context.Context) *models.Mirror {

@@ -1,12 +1,14 @@
 package models
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 	redis "gopkg.in/redis.v5"
 	"os"
+	"time"
 )
 
 var redisconn *redis.Client
@@ -21,12 +23,12 @@ type Contact struct {
 }
 
 func r() *redis.Client {
-	addr := "redis"
+	addr := "redis:6379"
 	if os.Getenv("REDIS_ADDR") != "" {
 		addr = os.Getenv("REDIS_ADDR")
 	}
 	if redisconn == nil {
-		redisconn = redis.NewClient(&redis.Options{
+		return redis.NewClient(&redis.Options{
 			Addr:     addr,
 			Password: "",
 			DB:       0,
@@ -38,7 +40,10 @@ func r() *redis.Client {
 
 func (c *Contact) GenerateToken() string {
 	token := uuid.NewV4().String()
-	r().Set("contact_token::"+c.EMail, token, 86400)
+	err := r().Set("contact_token::"+c.EMail, token, time.Hour*24).Err()
+	if err != nil {
+		log.Error(err)
+	}
 	return token
 }
 
@@ -67,6 +72,7 @@ func AuthContactWithPassword(email, password string) (*Contact, string) {
 	}
 	err := bcrypt.CompareHashAndPassword([]byte(c.PasswordDigest), []byte(password))
 	if err != nil {
+		log.Error(err)
 		return nil, ""
 	}
 	val := c.GenerateToken()

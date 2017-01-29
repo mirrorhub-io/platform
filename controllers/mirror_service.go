@@ -11,14 +11,18 @@ type MirrorServiceServer struct {
 }
 
 func (m *MirrorServiceServer) Get(ctx context.Context, request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
-	_, err := auth(ctx)
-	mirrors := make([]*pb.Mirror, 0)
-	if err == nil {
-		mirrors = models.MirrorList(10, 0).ToProto()
+	contact, _, err := AuthContact(ctx)
+	if err != nil {
+		return nil, err
 	}
+	if contact == nil {
+		return nil, errors.New("Unauthorized")
+	}
+	mirrors := make([]*pb.Mirror, 0)
+	mirrors = models.MirrorList(10, 0).ToProto()
 	return &pb.MirrorGetResponse{
 		Mirrors: mirrors,
-	}, err
+	}, nil
 }
 
 func (m *MirrorServiceServer) Find(ctx context.Context, request *pb.MirrorFindRequest) (*pb.Mirror, error) {
