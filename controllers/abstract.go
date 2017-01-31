@@ -32,19 +32,20 @@ func StartServer() {
 
 func AuthContact(ctx context.Context) (*models.Contact, string, error) {
 	md, _ := metadata.FromContext(ctx)
-	if md["contactemail"] == nil {
-		log.Debug("Email missing")
-		return nil, "", errors.New("Email missing")
-	}
 	if md["contacttoken"] == nil {
 		log.Debug("Token missing")
 		return nil, "", errors.New("Token missing")
 	}
-	contact, token := models.AuthContactWithToken(
-		md["contactemail"][0],
+	contact, err := models.AuthContactWithToken(
 		md["contacttoken"][0],
 	)
-	return contact, token, nil
+	if err != nil {
+		return nil, "", err
+	}
+	if contact == nil {
+		return nil, "", errors.New("Contact not resolvable.")
+	}
+	return contact, md["contacttoken"][0], nil
 }
 
 func AuthMirror(ctx context.Context) (*models.Mirror, error) {

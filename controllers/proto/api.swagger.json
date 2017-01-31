@@ -22,7 +22,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/protoCreateContactResponse"
+              "$ref": "#/definitions/protoContactResponse"
             }
           }
         },
@@ -48,7 +48,7 @@
           "200": {
             "description": "",
             "schema": {
-              "$ref": "#/definitions/protoAuthorizeContactResponse"
+              "$ref": "#/definitions/protoContactResponse"
             }
           }
         },
@@ -59,6 +59,46 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/protoAuthorizeContactRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ContactService"
+        ]
+      }
+    },
+    "/v1/contacts/self": {
+      "get": {
+        "operationId": "Get",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoContactResponse"
+            }
+          }
+        },
+        "tags": [
+          "ContactService"
+        ]
+      },
+      "put": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoContactResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoContact"
             }
           }
         ],
@@ -107,7 +147,7 @@
         ]
       }
     },
-    "/v1/mirrors/{client_token}": {
+    "/v1/mirrors/self": {
       "get": {
         "operationId": "Find",
         "responses": {
@@ -118,15 +158,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "client_token",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "format": "string"
-          }
-        ],
         "tags": [
           "MirrorService"
         ]
@@ -187,19 +218,6 @@
         }
       }
     },
-    "protoAuthorizeContactResponse": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string",
-          "format": "string"
-        },
-        "token": {
-          "type": "string",
-          "format": "string"
-        }
-      }
-    },
     "protoContact": {
       "type": "object",
       "properties": {
@@ -225,7 +243,7 @@
         }
       }
     },
-    "protoCreateContactResponse": {
+    "protoContactResponse": {
       "type": "object",
       "properties": {
         "token": {
