@@ -163,6 +163,94 @@
         ]
       }
     },
+    "/v1/mirrors/{id}": {
+      "get": {
+        "operationId": "FindById",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "MirrorService"
+        ]
+      },
+      "post": {
+        "operationId": "UpdateById",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        ],
+        "tags": [
+          "MirrorService"
+        ]
+      }
+    },
+    "/v1/mirrors/{mirror_id}/service/{endpoint_id}": {
+      "put": {
+        "operationId": "Connect",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoMirror"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "mirror_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "endpoint_id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "MirrorService"
+        ]
+      }
+    },
     "/v1/services": {
       "get": {
         "operationId": "Get",
@@ -202,6 +290,62 @@
           "ServiceService"
         ]
       }
+    },
+    "/v1/services/{id}": {
+      "get": {
+        "operationId": "Find",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoService"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ServiceService"
+        ]
+      },
+      "post": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/protoService"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoService"
+            }
+          }
+        ],
+        "tags": [
+          "ServiceService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -215,6 +359,19 @@
         "password": {
           "type": "string",
           "format": "string"
+        }
+      }
+    },
+    "protoConnectServiceAndMirror": {
+      "type": "object",
+      "properties": {
+        "mirror_id": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "endpoint_id": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

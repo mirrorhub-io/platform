@@ -30,16 +30,6 @@ service ContactService {
   }
 }
 
-message ContactResponse {
-  string token = 1;
-  Contact contact = 2;
-}
-
-message AuthorizeContactRequest {
-  string email = 1;
-  string password = 2;
-}
-
 service MirrorService {
   rpc Get(MirrorGetRequest) returns (MirrorGetResponse) {
     option (google.api.http) = {
@@ -49,6 +39,22 @@ service MirrorService {
   rpc Find(MirrorFindRequest) returns (Mirror) {
     option (google.api.http) = {
       get: "/v1/mirrors/self"
+    };
+  }
+  rpc FindById(Mirror) returns (Mirror) {
+    option (google.api.http) = {
+      get: "/v1/mirrors/{id}"
+    };
+  }
+  rpc UpdateById(Mirror) returns (Mirror) {
+    option (google.api.http) = {
+      post: "/v1/mirrors/{id}",
+      body: "*"
+    };
+  }
+  rpc Connect(ConnectServiceAndMirror) returns (Mirror) {
+    option (google.api.http) = {
+      put: "/v1/mirrors/{mirror_id}/service/{endpoint_id}"
     };
   }
   rpc Create(Mirror) returns (Mirror) {
@@ -65,12 +71,38 @@ service ServiceService {
       get: "/v1/services"
     };
   }
+  rpc Update(Service) returns (Service) {
+    option (google.api.http) = {
+      post: "/v1/services/{id}",
+      body: "*"
+    };
+  }
+  rpc Find(Service) returns (Service) {
+    option (google.api.http) = {
+      get: "/v1/services/{id}",
+    };
+  }
   rpc Create(Service) returns (Service) {
     option (google.api.http) = {
       post: "/v1/services",
       body: "*"
     };
   }
+}
+
+message ContactResponse {
+  string token = 1;
+  Contact contact = 2;
+}
+
+message AuthorizeContactRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message ConnectServiceAndMirror {
+  int32 mirror_id = 1;
+  int32 endpoint_id = 2;
 }
 
 message MirrorFindRequest {
