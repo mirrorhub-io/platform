@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/satori/go.uuid"
