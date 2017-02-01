@@ -33,6 +33,9 @@ func (m *MirrorServiceServer) Find(ctx context.Context,
 
 func (m *MirrorServiceServer) Connect(ctx context.Context,
 	request *pb.ConnectServiceAndMirror) (*pb.Mirror, error) {
+	if request.MirrorId == request.EndpointId {
+		return nil, errors.New("MirrorId shouldn't equal with EndpointId")
+	}
 	base, base_err := models.FindMirrorById(request.MirrorId)
 	if base_err != nil {
 		return nil, errors.New("[Mirror] Record not found.")
@@ -41,10 +44,8 @@ func (m *MirrorServiceServer) Connect(ctx context.Context,
 	if endpoint_err != nil {
 		return nil, errors.New("[Endpoint] Record not found.")
 	}
-	models.Connection().Model(&base).Update(
-		"service_endpoint_id",
-		request.EndpointId,
-	)
+	base.ServiceEndpointID = request.EndpointId
+	models.Connection().Save(&base)
 	return base.ToProto(), nil
 }
 

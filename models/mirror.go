@@ -11,20 +11,20 @@ type Mirror struct {
 	gorm.Model
 
 	ContactID        int32
-	IPv4             string `gorm:"not null"`
-	IPv6             string `gorm:"not null"`
-	Domain           string `gorm:"not null"`
-	LocalDestination string `gorm:"not null"`
-	Name             string `gorm:"not null"`
+	IPv4             string
+	IPv6             string
+	Domain           string
+	LocalDestination string
+	Name             string
 
 	Traffic   int64
 	Bandwidth int64
 	Storage   int64
 
-	ClientToken string `gorm:"not null;unique"`
+	ClientToken string
 
-	ServiceEnpointID int32
-	ServiceID        int32
+	ServiceEndpointID int32
+	ServiceID         int32
 }
 
 type MirrorCollection struct {
@@ -66,6 +66,10 @@ func (m *Mirror) FetchServices() *ServiceCollection {
 	}
 }
 
+func (m *Mirror) Update(request *pb.Mirror) error {
+	return nil
+}
+
 func (m *Mirror) BeforeCreate() {
 	m.ClientToken = uuid.NewV4().String()
 }
@@ -81,20 +85,16 @@ func FindMirrorById(id int32) (*Mirror, error) {
 	return se, nil
 }
 
-func (m *Mirror) ServiceEnpoint() *Mirror {
-	var se *Mirror
-	Connection().Where(
-		"service_enpoint_id = ?",
-		m.ServiceEnpointID,
-	).First(&se)
-	return se
+func (m *Mirror) ServiceEndpoint() *Mirror {
+	mirror, _ := FindMirrorById(m.ServiceEndpointID)
+	return mirror
 }
 
-func (m *Mirror) ToProto() *pb.Mirror {
-	se := m.ServiceEnpoint()
+func (m *Mirror) ToProto(nested ...bool) *pb.Mirror {
+	se := m.ServiceEndpoint()
 	var sep *pb.Mirror
-	if se != nil {
-		sep = se.ToProto()
+	if se != nil && len(nested) == 0 {
+		sep = se.ToProto(false)
 	}
 
 	return &pb.Mirror{
