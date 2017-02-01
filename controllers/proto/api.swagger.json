@@ -219,7 +219,7 @@
         ]
       }
     },
-    "/v1/mirrors/{mirror_id}/service/{endpoint_id}": {
+    "/v1/mirrors/{mirror_id}/endpoint/{endpoint_id}": {
       "put": {
         "operationId": "Connect",
         "responses": {

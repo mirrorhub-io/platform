@@ -705,7 +705,7 @@ var (
 
 	pattern_MirrorService_UpdateById_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "mirrors", "id"}, ""))
 
-	pattern_MirrorService_Connect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "mirrors", "mirror_id", "service", "endpoint_id"}, ""))
+	pattern_MirrorService_Connect_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"v1", "mirrors", "mirror_id", "endpoint", "endpoint_id"}, ""))
 
 	pattern_MirrorService_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "mirrors"}, ""))
 )
