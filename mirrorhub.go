@@ -1,13 +1,14 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/mirrorhub-io/platform/controllers"
-	"github.com/mirrorhub-io/platform/models"
+	"fmt"
+	"github.com/mirrorhub-io/platform/cmd"
+	"os"
 )
 
 func main() {
-	log.Info("Starting server.")
-	controllers.StartServer()
-	defer models.Connection().Close()
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
 }
