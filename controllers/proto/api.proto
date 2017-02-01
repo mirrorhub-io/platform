@@ -54,7 +54,7 @@ service MirrorService {
   }
   rpc Connect(ConnectServiceAndMirror) returns (Mirror) {
     option (google.api.http) = {
-      put: "/v1/mirrors/{mirror_id}/service/{endpoint_id}"
+      put: "/v1/mirrors/{mirror_id}/endpoint/{endpoint_id}"
     };
   }
   rpc Create(Mirror) returns (Mirror) {

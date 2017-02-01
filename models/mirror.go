@@ -1,8 +1,11 @@
 package models
 
 import (
+	"errors"
+	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
+	"github.com/satori/go.uuid"
 )
 
 type Mirror struct {
@@ -64,16 +67,48 @@ func (m *Mirror) FetchServices() *ServiceCollection {
 	}
 }
 
+func (m *Mirror) BeforeCreate() {
+	m.ClientToken = uuid.NewV4().String()
+}
+
+func FindMirrorById(id int32) (*Mirror, error) {
+	se := &Mirror{}
+	if Connection().Where(
+		"id = ?",
+		id,
+	).First(&se).RecordNotFound() {
+		return nil, errors.New("Record not found.")
+	}
+	return se, nil
+}
+
+func (m *Mirror) ServiceEnpoint() *Mirror {
+	var se *Mirror
+	Connection().Where(
+		"service_enpoint_id = ?",
+		m.ServiceEnpointID,
+	).First(&se)
+	return se
+}
+
 func (m *Mirror) ToProto() *pb.Mirror {
+	se := m.ServiceEnpoint()
+	var sep *pb.Mirror
+	if se != nil {
+		sep = se.ToProto()
+	}
+
 	return &pb.Mirror{
-		Name:        m.Name,
-		Ipv4:        m.IPv4,
-		Ipv6:        m.IPv6,
-		Domain:      m.Domain,
-		ContactId:   m.ContactID,
-		Traffic:     m.Traffic,
-		ClientToken: m.ClientToken,
-		Bandwidth:   m.Bandwidth,
-		CreatedAt:   m.CreatedAt.Unix(),
+		Id:              int32(m.ID),
+		Name:            m.Name,
+		Ipv4:            m.IPv4,
+		Ipv6:            m.IPv6,
+		Domain:          m.Domain,
+		ContactId:       m.ContactID,
+		Traffic:         m.Traffic,
+		ClientToken:     m.ClientToken,
+		Bandwidth:       m.Bandwidth,
+		CreatedAt:       m.CreatedAt.Unix(),
+		ServiceEndpoint: sep,
 	}
 }

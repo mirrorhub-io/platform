@@ -31,6 +31,47 @@ func (m *MirrorServiceServer) Find(ctx context.Context,
 	return mirror.ToProto(), nil
 }
 
+func (m *MirrorServiceServer) Connect(ctx context.Context,
+	request *pb.ConnectServiceAndMirror) (*pb.Mirror, error) {
+	base, base_err := models.FindMirrorById(request.MirrorId)
+	if base_err != nil {
+		return nil, errors.New("[Mirror] Record not found.")
+	}
+	_, endpoint_err := models.FindMirrorById(request.EndpointId)
+	if endpoint_err != nil {
+		return nil, errors.New("[Endpoint] Record not found.")
+	}
+	models.Connection().Model(&base).Update(
+		"service_endpoint_id",
+		request.EndpointId,
+	)
+	return base.ToProto(), nil
+}
+
+func (m *MirrorServiceServer) FindById(ctx context.Context,
+	request *pb.Mirror) (*pb.Mirror, error) {
+	base, base_err := models.FindMirrorById(request.Id)
+	if base_err != nil {
+		return nil, errors.New("[Mirror] Record not found.")
+	}
+	return base.ToProto(), nil
+}
+
+func (m *MirrorServiceServer) UpdateById(ctx context.Context,
+	request *pb.Mirror) (*pb.Mirror, error) {
+	base, base_err := models.FindMirrorById(request.Id)
+	if base_err != nil {
+		return nil, errors.New("[Mirror] Record not found.")
+	}
+	models.Connection().Model(&base).Updates(
+		map[string]interface{}{
+			"ipv4": request.Ipv4,
+			"ipv6": request.Ipv6,
+		},
+	)
+	return base.ToProto(), nil
+}
+
 func (m *MirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
 	if err := contactAuth(ctx); err != nil {
 		return nil, err
