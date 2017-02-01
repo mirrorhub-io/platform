@@ -11,8 +11,8 @@ type MirrorServiceServer struct {
 }
 
 func (m *MirrorServiceServer) Get(ctx context.Context,
-	request *pb.MirrorGetRequest) (*pb.MirrorGetResponse, error) {
-	if err := contactAuth(ctx); err != nil {
+	request *pb.ListRequest) (*pb.MirrorGetResponse, error) {
+	if _, err := contactAuth(ctx); err != nil {
 		return nil, err
 	}
 	mirrors := make([]*pb.Mirror, 0)
@@ -51,6 +51,9 @@ func (m *MirrorServiceServer) Connect(ctx context.Context,
 
 func (m *MirrorServiceServer) FindById(ctx context.Context,
 	request *pb.Mirror) (*pb.Mirror, error) {
+	if _, err := contactAuth(ctx); err != nil {
+		return nil, err
+	}
 	base, base_err := models.FindMirrorById(request.Id)
 	if base_err != nil {
 		return nil, errors.New("[Mirror] Record not found.")
@@ -60,35 +63,41 @@ func (m *MirrorServiceServer) FindById(ctx context.Context,
 
 func (m *MirrorServiceServer) UpdateById(ctx context.Context,
 	request *pb.Mirror) (*pb.Mirror, error) {
+	contact, err := contactAuth(ctx)
+	if err != nil {
+		return nil, err
+	}
 	base, base_err := models.FindMirrorById(request.Id)
 	if base_err != nil {
 		return nil, errors.New("[Mirror] Record not found.")
 	}
+	if base.ContactID != int32(contact.ID) && contact.Admin == false {
+		return nil, errors.New("Insufficient permissions")
+	}
 	models.Connection().Model(&base).Updates(
-		map[string]interface{}{
-			"ipv4": request.Ipv4,
-			"ipv6": request.Ipv6,
-		},
+		models.MirrorFromProto(request),
 	)
 	return base.ToProto(), nil
 }
 
 func (m *MirrorServiceServer) Create(ctx context.Context, mirror *pb.Mirror) (*pb.Mirror, error) {
-	if err := contactAuth(ctx); err != nil {
+	contact, err := contactAuth(ctx)
+	if err != nil {
 		return nil, err
 	}
+	mirror.ContactId = int32(contact.ID)
 	x := models.MirrorFromProto(mirror)
 	models.Connection().Create(&x)
 	return x.ToProto(), nil
 }
 
-func contactAuth(ctx context.Context) error {
+func contactAuth(ctx context.Context) (*models.Contact, error) {
 	contact, _, err := AuthContact(ctx)
 	if err != nil {
-		return err
+		return contact, err
 	}
 	if contact == nil {
-		return errors.New("Unauthorized")
+		return contact, errors.New("Unauthorized")
 	}
-	return nil
+	return contact, nil
 }

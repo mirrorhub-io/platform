@@ -397,6 +397,12 @@
         "admin": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "mirrors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protoMirror"
+          }
         }
       }
     },
@@ -409,6 +415,19 @@
         },
         "contact": {
           "$ref": "#/definitions/protoContact"
+        }
+      }
+    },
+    "protoListRequest": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "offset": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -468,6 +487,10 @@
         "local_destination": {
           "type": "string",
           "format": "string"
+        },
+        "storage": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -477,19 +500,6 @@
         "client_token": {
           "type": "string",
           "format": "string"
-        }
-      }
-    },
-    "protoMirrorGetRequest": {
-      "type": "object",
-      "properties": {
-        "limit": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "offset": {
-          "type": "integer",
-          "format": "int32"
         }
       }
     },

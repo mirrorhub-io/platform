@@ -100,10 +100,20 @@ func AuthContactWithPassword(email, password string) (*Contact, string, error) {
 
 func (c *Contact) ToProto() *pb.Contact {
 	return &pb.Contact{
-		Id:    int32(c.ID),
-		Name:  c.Name,
-		Email: c.EMail,
-		Admin: c.Admin,
+		Id:      int32(c.ID),
+		Name:    c.Name,
+		Email:   c.EMail,
+		Admin:   c.Admin,
+		Mirrors: c.Mirrors().ToProto(),
+	}
+}
+
+func (c *Contact) Mirrors() *MirrorCollection {
+	m := &Mirror{ContactID: int32(c.ID)}
+	mirrors := make([]*Mirror, 0)
+	Connection().Where(&m).Find(&mirrors)
+	return &MirrorCollection{
+		Mirrors: mirrors,
 	}
 }
 

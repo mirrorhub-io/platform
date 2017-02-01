@@ -39,14 +39,16 @@ func MirrorList(limit int, offset int) *MirrorCollection {
 
 func MirrorFromProto(p *pb.Mirror) *Mirror {
 	return &Mirror{
-		Name:        p.Name,
-		IPv4:        p.Ipv4,
-		IPv6:        p.Ipv6,
-		Domain:      p.Domain,
-		ContactID:   p.ContactId,
-		Traffic:     p.Traffic,
-		ClientToken: p.ClientToken,
-		Bandwidth:   p.Bandwidth,
+		Name:             p.Name,
+		IPv4:             p.Ipv4,
+		IPv6:             p.Ipv6,
+		Domain:           p.Domain,
+		ContactID:        p.ContactId,
+		Traffic:          p.Traffic,
+		Storage:          p.Storage,
+		ClientToken:      p.ClientToken,
+		LocalDestination: p.LocalDestination,
+		Bandwidth:        p.Bandwidth,
 	}
 }
 
@@ -107,6 +109,7 @@ func (m *Mirror) ToProto(nested ...bool) *pb.Mirror {
 		Traffic:         m.Traffic,
 		ClientToken:     m.ClientToken,
 		Bandwidth:       m.Bandwidth,
+		Storage:         m.Storage,
 		CreatedAt:       m.CreatedAt.Unix(),
 		ServiceEndpoint: sep,
 	}

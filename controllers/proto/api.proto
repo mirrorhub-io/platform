@@ -31,7 +31,7 @@ service ContactService {
 }
 
 service MirrorService {
-  rpc Get(MirrorGetRequest) returns (MirrorGetResponse) {
+  rpc Get(ListRequest) returns (MirrorGetResponse) {
     option (google.api.http) = {
       get: "/v1/mirrors"
     };
@@ -109,7 +109,7 @@ message MirrorFindRequest {
   string client_token = 1;  
 }
 
-message MirrorGetRequest {
+message ListRequest {
   int32 limit = 1;
   int32 offset = 2;
 }
@@ -133,6 +133,7 @@ message Contact {
   string email = 3;
   string password = 4;
   bool admin = 5;
+  repeated Mirror mirrors = 6;
 }
 
 message Service {
@@ -157,5 +158,6 @@ message Mirror {
   Service service = 12;
   Mirror service_endpoint = 13;
   string local_destination = 14;
+  int64 storage = 15;
 }
 

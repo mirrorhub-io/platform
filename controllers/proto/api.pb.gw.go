@@ -88,7 +88,7 @@ var (
 )
 
 func request_MirrorService_Get_0(ctx context.Context, marshaler runtime.Marshaler, client MirrorServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MirrorGetRequest
+	var protoReq ListRequest
 	var metadata runtime.ServerMetadata
 
 	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_MirrorService_Get_0); err != nil {
