@@ -15,10 +15,11 @@
 package cmd
 
 import (
-	log "github.com/Sirupsen/logrus"
+	"fmt"
 	"github.com/mirrorhub-io/platform/controllers"
 	"github.com/mirrorhub-io/platform/models"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // apiCmd represents the api command
@@ -26,7 +27,8 @@ var apiCmd = &cobra.Command{
 	Use:   "api",
 	Short: "Mirrorhub API command",
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Info("Starting server.")
+		fmt.Println("Gateway: ", viper.GetString("API.gateway"))
+		fmt.Println("Base: ", viper.GetString("API.base"))
 		controllers.StartServer()
 		defer models.Connection().Close()
 	},

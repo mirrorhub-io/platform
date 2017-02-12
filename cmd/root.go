@@ -59,13 +59,25 @@ func initConfig() {
 	if cfgFile != "" { // enable ability to specify config file via flag
 		viper.SetConfigFile(cfgFile)
 	}
-
 	viper.SetConfigName(".mirrorhub") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")      // adding home directory as first search path
-	viper.AutomaticEnv()              // read in environment variables that match
+	viper.AddConfigPath("$HOME")
+	viper.AddConfigPath(".config")
+	viper.AddConfigPath("/etc/mirrorhub")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+
+	viper.SetDefault("Contact", map[string]string{
+		"email":    "youmail@example.org",
+		"password": "Test1234",
+	})
+	viper.SetDefault("API", map[string]string{
+		"gateway": "localhost:8080",
+		"base":    "localhost:9000",
+	})
+
 }

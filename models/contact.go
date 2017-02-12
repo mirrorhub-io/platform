@@ -5,14 +5,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
+	utils "github.com/mirrorhub-io/platform/utils"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
-	redis "gopkg.in/redis.v5"
-	"os"
 	"time"
 )
-
-var redisconn *redis.Client
 
 type Contact struct {
 	gorm.Model
@@ -23,29 +20,13 @@ type Contact struct {
 	Admin          bool
 }
 
-func r() *redis.Client {
-	addr := "redis:6379"
-	if os.Getenv("REDIS_ADDR") != "" {
-		addr = os.Getenv("REDIS_ADDR")
-	}
-	if redisconn == nil {
-		return redis.NewClient(&redis.Options{
-			Addr:     addr,
-			Password: "",
-			DB:       0,
-			PoolSize: 100,
-		})
-	}
-	return redisconn
-}
-
 func (c *Contact) DelToken(token string) {
-	r().Del("contact_token::" + token)
+	utils.Redis().Del("contact_token::" + token)
 }
 
 func (c *Contact) GenerateToken() string {
 	token := uuid.NewV4().String()
-	err := r().Set("contact_token::"+token, c.EMail, time.Hour*24).Err()
+	err := utils.Redis().Set("contact_token::"+token, c.EMail, time.Hour*24).Err()
 	if err != nil {
 		log.Error(err)
 	}
@@ -78,7 +59,7 @@ func (c *Contact) Update(cpb *pb.Contact, token string) (*Contact, string) {
 }
 
 func AuthContactWithToken(token string) (*Contact, error) {
-	email, err := r().Get("contact_token::" + token).Result()
+	email, err := utils.Redis().Get("contact_token::" + token).Result()
 	if err != nil {
 		return nil, errors.New("Token not present.")
 	}
