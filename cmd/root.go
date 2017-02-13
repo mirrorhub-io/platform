@@ -60,6 +60,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 	viper.SetConfigName(".mirrorhub") // name of config file (without extension)
+	viper.SetEnvPrefix("MIRRORHUB")
 	viper.AddConfigPath("$HOME")
 	viper.AddConfigPath(".config")
 	viper.AddConfigPath("/etc/mirrorhub")
@@ -71,10 +72,8 @@ func initConfig() {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
 
-	viper.SetDefault("Contact", map[string]string{
-		"email":    "youmail@example.org",
-		"password": "Test1234",
-	})
+	viper.SetDefault("Email", "admin@mirrorhub.io")
+	viper.SetDefault("Password", "")
 	viper.SetDefault("API", map[string]string{
 		"gateway": "localhost:8080",
 		"base":    "localhost:9000",

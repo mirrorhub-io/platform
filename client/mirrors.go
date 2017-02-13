@@ -2,10 +2,24 @@ package client
 
 import (
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
-func (c *Client) CreateMirror(request *pb.Mirror) {
+type MirrorClient struct {
+	Client *Client
+	conn   pb.MirrorServiceClient
+}
 
+func (c *MirrorClient) connection() pb.MirrorServiceClient {
+	if c.conn == nil {
+		c.conn = pb.NewMirrorServiceClient(c.Client.Connection())
+	}
+	return c.conn
+}
+
+func (c *MirrorClient) List() (*pb.MirrorGetResponse, error) {
+	c.Client.Contact().Authorize()
+	return c.connection().Get(
+		c.Client.Context,
+		&pb.ListRequest{},
+	)
 }
