@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"strings"
