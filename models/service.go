@@ -3,13 +3,15 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
+	"strings"
 )
 
 type Service struct {
 	gorm.Model
 
-	Name    string
-	Storage int64
+	Name     string
+	Storage  int64
+	FileList string
 }
 
 type ServiceCollection struct {
@@ -22,6 +24,23 @@ func ServiceFromProto(s *pb.Service) *Service {
 		Name:    s.Name,
 		Storage: s.Storage,
 	}
+}
+
+func FindServiceById(id int32) (*Service, error) {
+	se := &Service{}
+	if Connection().Where(
+		"id = ?",
+		id,
+	).First(&se).RecordNotFound() {
+		return nil, errors.New("Record not found.")
+	}
+	return se, nil
+}
+
+func ServiceList(limit int, offset int) *ServiceCollection {
+	services := make([]*Service, 0)
+	Connection().Find(&services)
+	return &ServiceCollection{Services: services}
 }
 
 func (sc *ServiceCollection) ToServices() []*Service {
@@ -40,10 +59,15 @@ func (sc *ServiceCollection) ToProto() []*pb.Service {
 	return services
 }
 
+func (s *Service) Files() []string {
+	return strings.Split(s.FileList, ",")
+}
+
 func (s *Service) ToProto() *pb.Service {
 	return &pb.Service{
 		Id:      int32(s.ID),
 		Name:    s.Name,
 		Storage: s.Storage,
+		Files:   s.Files(),
 	}
 }

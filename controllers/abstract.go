@@ -21,12 +21,14 @@ func StartServer() {
 	mopts := []grpc.DialOption{grpc.WithInsecure()}
 	pb.RegisterMirrorServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
 	pb.RegisterContactServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
+	pb.RegisterServiceServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
 	go http.ListenAndServe(":8080", mux)
 	lis, _ := net.Listen("tcp", ":9000")
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterMirrorServiceServer(grpcServer, new(MirrorServiceServer))
 	pb.RegisterContactServiceServer(grpcServer, new(ContactServiceServer))
+	pb.RegisterServiceServiceServer(grpcServer, new(ServiceServiceServer))
 	grpcServer.Serve(lis)
 }
 

@@ -140,7 +140,7 @@ message Service {
   int32 id = 1;
   string name = 2;
   int64 storage = 3;
-  int64 traffic_consumption = 4;
+  repeated string files = 4;
 }
 
 message Mirror {
