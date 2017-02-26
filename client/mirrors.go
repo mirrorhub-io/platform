@@ -17,7 +17,6 @@ func (c *MirrorClient) connection() pb.MirrorServiceClient {
 }
 
 func (c *MirrorClient) List() (*pb.MirrorGetResponse, error) {
-	c.Client.Contact().Authorize()
 	return c.connection().Get(
 		c.Client.Context,
 		&pb.ListRequest{},

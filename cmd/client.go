@@ -54,9 +54,14 @@ var clientCmd = &cobra.Command{
 	},
 }
 
+var clientMirrorCmd = &cobra.Command{
+	Use:   "mirror",
+	Short: "Mirrorhub mirror utils",
+}
+
 var clientContactCmd = &cobra.Command{
 	Use:   "contact",
-	Short: "mirrorhub contacts utils",
+	Short: "Mirrorhub contacts utils",
 }
 
 var clientContactCreateCmd = &cobra.Command{
@@ -105,9 +110,18 @@ var clientContactGetCmd = &cobra.Command{
 	},
 }
 
+var clientMirrorListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List mirrors",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret(c.Mirror().List())
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(clientCmd)
 	clientCmd.AddCommand(clientContactCmd)
+	clientCmd.AddCommand(clientMirrorCmd)
 	clientCmd.PersistentFlags().StringVarP(&email, "email", "e", "", "contact email")
 	clientCmd.PersistentFlags().StringVarP(&password, "password", "p", "", "contact password (min 8 chars)")
 
@@ -117,4 +131,6 @@ func init() {
 	clientContactUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "contact name")
 	clientContactCmd.AddCommand(clientContactGetCmd)
 	clientContactCmd.AddCommand(clientContactAuthCmd)
+
+	clientMirrorCmd.AddCommand(clientMirrorListCmd)
 }
