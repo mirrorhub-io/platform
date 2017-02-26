@@ -1,9 +1,11 @@
 package models
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"os"
+	"strings"
 )
 
 var conn *gorm.DB
@@ -25,4 +27,12 @@ func db_init() {
 	db.AutoMigrate(&Service{})
 	db.AutoMigrate(&Contact{})
 	conn = db
+}
+
+func joinErrors(errs []error) error {
+	err := make([]string, len(errs))
+	for i, e := range errs {
+		err[i] = e.Error()
+	}
+	return errors.New(strings.Join(err, ";"))
 }

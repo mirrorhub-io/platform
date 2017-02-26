@@ -98,7 +98,7 @@ func (c *Contact) Mirrors() *MirrorCollection {
 	}
 }
 
-func CreateContact(name, email, password string) (*Contact, string) {
+func CreateContact(name, email, password string) (*Contact, string, error) {
 	pw, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 	c := &Contact{
 		Name:           name,
@@ -106,10 +106,13 @@ func CreateContact(name, email, password string) (*Contact, string) {
 		PasswordDigest: string(pw),
 		Admin:          false,
 	}
-	Connection().Create(&c)
+	err := Connection().Create(&c).GetErrors()
+	if len(err) > 0 {
+		return nil, "", joinErrors(err)
+	}
 	if Connection().NewRecord(c) {
-		return nil, ""
+		return nil, "", errors.New("Contact create error.")
 	}
 	token := c.GenerateToken()
-	return c, token
+	return c, token, nil
 }

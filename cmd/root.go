@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -67,10 +68,7 @@ func initConfig() {
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv()
 
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
+	viper.ReadInConfig()
 
 	viper.SetDefault("Email", "admin@mirrorhub.io")
 	viper.SetDefault("Password", "")
@@ -79,4 +77,15 @@ func initConfig() {
 		"base":    "localhost:9000",
 	})
 
+}
+
+func ret(val interface{}, err error) {
+	s, _ := prettyjson.Marshal(val)
+	if err != nil {
+		s, _ = prettyjson.Marshal(err.Error())
+		fmt.Println(string(s))
+		os.Exit(1)
+	}
+	fmt.Println(string(s))
+	os.Exit(0)
 }

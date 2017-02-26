@@ -15,55 +15,106 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/mirrorhub-io/platform/client"
 	"github.com/spf13/cobra"
-	"log"
+	"github.com/spf13/viper"
+	"io/ioutil"
+	"os/user"
 )
 
 var (
 	name     string
 	email    string
 	password string
+	token    string
+	c        *client.Client
 )
+
+func currentTokenFile() string {
+	u, _ := user.Current()
+	return "/tmp/.mirrorhub." + u.Username + ".token"
+}
+
+var clientCmd = &cobra.Command{
+	Use:   "client",
+	Short: "Mirrorhub API-Client",
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		c = client.Initialize()
+		r, _ := ioutil.ReadFile(currentTokenFile())
+		if len(r) > 0 {
+			c.ContactToken = string(r)
+			c.PrepareHeader()
+		}
+		if email == "" {
+			email = viper.GetString("Email")
+		}
+		if password == "" {
+			password = viper.GetString("Password")
+		}
+	},
+}
 
 var clientContactCmd = &cobra.Command{
 	Use:   "contact",
 	Short: "mirrorhub contacts utils",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("client called")
-	},
 }
+
 var clientContactCreateCmd = &cobra.Command{
 	Use:   "create",
-	Short: "mirrorhub contact create",
+	Short: "Create contact",
 	Run: func(cmd *cobra.Command, args []string) {
-		c := client.Initialize()
-		x, err := c.Contact().Create(name, email, password)
-		if err != nil {
-			log.Fatal(err)
+		co, err := c.Contact().Create(name, email, password)
+		if co != nil {
+			ioutil.WriteFile(currentTokenFile(), []byte(c.ContactToken), 0600)
 		}
-		log.Fatal(x)
-		fmt.Println("client called")
+		ret(co, err)
+	},
+}
+
+var clientContactAuthCmd = &cobra.Command{
+	Use:   "login",
+	Short: "Login and keep seesion",
+	Run: func(cmd *cobra.Command, args []string) {
+		c.ContactEmail = email
+		c.ContactPassword = password
+		co, err := c.Contact().Authorize()
+		if co != nil {
+			ioutil.WriteFile(currentTokenFile(), []byte(c.ContactToken), 0600)
+		}
+		ret(co, err)
+	},
+}
+
+var clientContactUpdateCmd = &cobra.Command{
+	Use:   "update",
+	Short: "Update contact",
+	Run: func(cmd *cobra.Command, args []string) {
+		co, err := c.Contact().Update(name, email, password)
+		if co != nil {
+			ioutil.WriteFile(currentTokenFile(), []byte(c.ContactToken), 0600)
+		}
+		ret(co, err)
+	},
+}
+
+var clientContactGetCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get contact",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret(c.Contact().Get(email))
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(clientContactCmd)
+	RootCmd.AddCommand(clientCmd)
+	clientCmd.AddCommand(clientContactCmd)
+	clientCmd.PersistentFlags().StringVarP(&email, "email", "e", "", "contact email")
+	clientCmd.PersistentFlags().StringVarP(&password, "password", "p", "", "contact password (min 8 chars)")
+
 	clientContactCmd.AddCommand(clientContactCreateCmd)
 	clientContactCreateCmd.Flags().StringVarP(&name, "name", "n", "", "contact name")
-	clientContactCreateCmd.Flags().StringVarP(&email, "email", "e", "", "contact email")
-	clientContactCreateCmd.Flags().StringVarP(&password, "password", "p", "", "contact password (min 8 chars)")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// clientCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// clientCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	clientContactCmd.AddCommand(clientContactUpdateCmd)
+	clientContactUpdateCmd.Flags().StringVarP(&name, "name", "n", "", "contact name")
+	clientContactCmd.AddCommand(clientContactGetCmd)
+	clientContactCmd.AddCommand(clientContactAuthCmd)
 }

@@ -50,3 +50,27 @@ func (c *ContactClient) Create(name, email, password string) (*pb.ContactRespons
 	}
 	return c.UpdateSession(a), nil
 }
+
+func (c *ContactClient) Update(name, email, password string) (*pb.ContactResponse, error) {
+	a, err := c.connection().Update(
+		c.Client.Context,
+		&pb.Contact{
+			Name:     name,
+			Email:    email,
+			Password: password,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return c.UpdateSession(a), nil
+}
+
+func (c *ContactClient) Get(email string) (*pb.ContactResponse, error) {
+	return c.connection().Get(
+		c.Client.Context,
+		&pb.Contact{
+			Email: email,
+		},
+	)
+}

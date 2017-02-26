@@ -22,7 +22,6 @@ func Initialize() *Client {
 		ContactEmail:    viper.GetString("Email"),
 		ContactPassword: viper.GetString("Password"),
 		Server:          viper.GetString("API.base"),
-		Context:         context.Background(),
 	}
 }
 
@@ -50,14 +49,14 @@ func (c *Client) Mirror() *MirrorClient {
 }
 
 func (c *Client) PrepareHeader() {
-	if c.Context == nil {
-		c.Context = context.Background()
-	}
 	md := make(metadata.MD)
 	if len(c.ContactToken) > 0 {
 		md = metadata.New(map[string]string{
 			"ContactToken": c.ContactToken,
 		})
+	}
+	if c.Context == nil {
+		c.Context = metadata.NewContext(context.Background(), md)
 	}
 	grpc.SetHeader(c.Context, md)
 }

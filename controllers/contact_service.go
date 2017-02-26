@@ -18,7 +18,10 @@ func (m *ContactServiceServer) Create(ctx context.Context,
 	if len(c.Password) < 8 {
 		return nil, errors.New("Password missing or to short. (length min 8 chars)")
 	}
-	contact, token := models.CreateContact(c.Name, c.Email, c.Password)
+	contact, token, err := models.CreateContact(c.Name, c.Email, c.Password)
+	if err != nil {
+		return nil, err
+	}
 	if contact == nil {
 		return nil, errors.New("Creating contact failed.")
 	}
