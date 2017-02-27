@@ -11,7 +11,42 @@ We are trying to provide you as soon as possible a full stack solution which all
 
 **Coming soon**
 
+## CLI
+
+### Installation
+
+Download latest prebuilt binaries package. Select the correct binary and just run it.
+
+```
+Mirrorhub root command.
+
+Usage:
+  mirrorhub [command]
+
+Available Commands:
+  api          Start mirrorhub api
+  autocomplete Generate shell autocompletion script for Mirrorhub
+  client       Mirrorhub API-Client
+  gateway      Start mirrorhub rest-gateway
+
+Flags:
+      --config string   config file (default is $HOME/.mirrorhub.yaml)
+
+Use "mirrorhub [command] --help" for more information about a command.
+```
+
+A config could looks like the following.
+
+```yaml
+Email: huimoo@example.org
+Password: supersecurepassword
+API:
+  base: localhost:9000
+```
+
 ## API
+
+**Checkout protocol buffers under controllers/proto/api.proto**
 
 Authorize (HTTP-Header) from Client
 
@@ -23,15 +58,4 @@ Authorize (HTTP-Header) from Frontend
 
 ```
 Grpc-Metadata-ContactToken: <Token>
-```
-
-Current routes.
-
-```
-GET /v1/mirrors
-POST /v1/mirrors
-GET /v1/contacts/self   -> Get contact info (Auth!)
-PUT /v1/contacts/self   -> Update contact info, new token will be set (Auth!)
-POST /v1/contacts       -> Create new contact {name: <display_name>, email: ..., password: ...}
-POST /v1/contacts/auth  -> Login contact {email: <email>, password: <pass>}
 ```
