@@ -22,3 +22,27 @@ func (c *MirrorClient) List() (*pb.MirrorGetResponse, error) {
 		&pb.ListRequest{},
 	)
 }
+
+func (c *MirrorClient) FindById(id int32) (*pb.Mirror, error) {
+	return c.connection().FindById(
+		c.Client.Context,
+		&pb.Mirror{
+			Id: id,
+		},
+	)
+}
+
+func (c *MirrorClient) UpdateById(id int32, m *pb.Mirror) (*pb.Mirror, error) {
+	m.Id = id
+	return c.connection().UpdateById(
+		c.Client.Context,
+		m,
+	)
+}
+
+func (c *MirrorClient) Create(m *pb.Mirror) (*pb.Mirror, error) {
+	return c.connection().Create(
+		c.Client.Context,
+		m,
+	)
+}

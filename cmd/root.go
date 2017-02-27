@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -79,11 +80,16 @@ func initConfig() {
 
 }
 
+func exit(msg string) {
+	color.Red(msg)
+	os.Exit(1)
+}
+
 func ret(val interface{}, err error) {
 	s, _ := prettyjson.Marshal(val)
 	if err != nil {
 		s, _ = prettyjson.Marshal(err.Error())
-		fmt.Println(string(s))
+		color.Red(string(s))
 		os.Exit(1)
 	}
 	fmt.Println(string(s))
