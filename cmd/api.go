@@ -20,31 +20,65 @@ import (
 	"github.com/mirrorhub-io/platform/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"os"
+	"strings"
+)
+
+var (
+	addr string
+	port string
+	api  string
 )
 
 // apiCmd represents the api command
 var apiCmd = &cobra.Command{
 	Use:   "api",
-	Short: "Mirrorhub API command",
+	Short: "Start mirrorhub api",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Gateway: ", viper.GetString("API.gateway"))
-		fmt.Println("Base: ", viper.GetString("API.base"))
-		controllers.StartServer()
+		parseApiCommands(viper.GetString("API.base"))
+		controllers.StartApi(addr, port)
+		defer models.Connection().Close()
+	},
+}
+
+var gatewayCmd = &cobra.Command{
+	Use:   "gateway",
+	Short: "Start mirrorhub rest-gateway",
+	Run: func(cmd *cobra.Command, args []string) {
+		parseApiCommands(viper.GetString("API.gateway"))
+		if api == "" {
+			api = viper.GetString("API.base")
+			fmt.Println("Fallback to configured grpc server.")
+			if api == "" {
+				fmt.Println("Missing grpc server configuration")
+				os.Exit(1)
+			}
+		}
+		controllers.StartGateway(addr, port, api)
 		defer models.Connection().Close()
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(apiCmd)
+	apiCmd.Flags().StringVarP(&addr, "addr", "l", "127.0.0.1", "Bind addr.")
+	apiCmd.Flags().StringVarP(&port, "port", "p", "", "Bind port.")
+	RootCmd.AddCommand(gatewayCmd)
+	gatewayCmd.Flags().StringVarP(&addr, "addr", "l", "127.0.0.1", "Bind addr.")
+	gatewayCmd.Flags().StringVarP(&port, "port", "p", "", "Bind port.")
+	gatewayCmd.Flags().StringVarP(&api, "api", "a", "127.0.0.1:9000", "Grpc server.")
+}
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// apiCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// apiCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+func parseApiCommands(config string) {
+	a := strings.Split(config, ":")
+	if len(a) > 1 {
+		if addr == "" {
+			addr = a[0]
+		}
+		if port == "" {
+			port = a[1]
+		}
+	} else {
+		fmt.Println("Ignoring config (<addr>:<port> required)")
+	}
 }

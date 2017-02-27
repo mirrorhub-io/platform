@@ -13,23 +13,37 @@ import (
 	"net/http"
 )
 
-func StartServer() {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-	mux := runtime.NewServeMux()
-	mopts := []grpc.DialOption{grpc.WithInsecure()}
-	pb.RegisterMirrorServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
-	pb.RegisterContactServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
-	pb.RegisterServiceServiceHandlerFromEndpoint(ctx, mux, "localhost:9000", mopts)
-	go http.ListenAndServe(":8080", mux)
-	lis, _ := net.Listen("tcp", ":9000")
+func StartApi(addr, port string) {
+	bind_uri := addr + ":" + port
+	log.Info("Starting API with URI: " + bind_uri)
+	lis, err := net.Listen("tcp", bind_uri)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterMirrorServiceServer(grpcServer, new(MirrorServiceServer))
 	pb.RegisterContactServiceServer(grpcServer, new(ContactServiceServer))
 	pb.RegisterServiceServiceServer(grpcServer, new(ServiceServiceServer))
-	grpcServer.Serve(lis)
+	err = grpcServer.Serve(lis)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func StartGateway(addr, port, api string) {
+	bind_uri := addr + ":" + port
+	log.Info("Starting Gateway with URI: " + bind_uri)
+	log.Info("Expected API addr: " + api)
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	mux := runtime.NewServeMux()
+	mopts := []grpc.DialOption{grpc.WithInsecure()}
+	pb.RegisterMirrorServiceHandlerFromEndpoint(ctx, mux, api, mopts)
+	pb.RegisterContactServiceHandlerFromEndpoint(ctx, mux, api, mopts)
+	pb.RegisterServiceServiceHandlerFromEndpoint(ctx, mux, api, mopts)
+	http.ListenAndServe(bind_uri, mux)
 }
 
 func AuthContact(ctx context.Context) (*models.Contact, string, error) {
