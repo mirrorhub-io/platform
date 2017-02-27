@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 
+	"errors"
 	"github.com/fatih/color"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
@@ -26,13 +27,31 @@ import (
 
 var cfgFile string
 
+var (
+	autocompleteTarget string
+	autocompleteType   string
+)
+
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
 	Use:   "mirrorhub",
 	Short: "Mirrorhub root command.",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+}
+
+var autocompleteCmd = &cobra.Command{
+	Use:   "autocomplete",
+	Short: "Generate shell autocompletion script for Mirrorhub",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if autocompleteType != "bash" {
+			return errors.New("Only Bash is supported for now")
+		}
+		err := cmd.Root().GenBashCompletionFile(autocompleteTarget)
+		if err != nil {
+			return err
+		}
+		color.Green("Bash completion file for Mirrorhub saved to: " + autocompleteTarget)
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command sets flags appropriately.
@@ -47,13 +66,12 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mirrorhub.yaml)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
+	RootCmd.AddCommand(autocompleteCmd)
+
+	autocompleteCmd.PersistentFlags().StringVarP(&autocompleteTarget, "completionfile", "", "/etc/bash_completion.d/mirrorhub.sh", "Autocompletion file")
+	autocompleteCmd.PersistentFlags().StringVarP(&autocompleteType, "type", "", "bash", "Autocompletion type (currently only bash supported)")
+	autocompleteCmd.PersistentFlags().SetAnnotation("completionfile", cobra.BashCompFilenameExt, []string{})
 }
 
 // initConfig reads in config file and ENV variables if set.
