@@ -48,6 +48,12 @@ func (c *Client) Mirror() *MirrorClient {
 	}
 }
 
+func (c *Client) Service() *ServiceClient {
+	return &ServiceClient{
+		Client: c,
+	}
+}
+
 func (c *Client) PrepareHeader() {
 	md := make(metadata.MD)
 	if len(c.ContactToken) > 0 {

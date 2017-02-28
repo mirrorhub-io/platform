@@ -66,6 +66,11 @@ var clientContactCmd = &cobra.Command{
 	Short: "Mirrorhub contacts utils",
 }
 
+var clientServiceCmd = &cobra.Command{
+	Use:   "service",
+	Short: "Mirrorhub service utils",
+}
+
 var clientContactCreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create contact",
@@ -197,10 +202,19 @@ func mirrorFromFlags() *pb.Mirror {
 	return m
 }
 
+var clientServiceListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List services",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret(c.Service().List())
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(clientCmd)
 	clientCmd.AddCommand(clientContactCmd)
 	clientCmd.AddCommand(clientMirrorCmd)
+	clientCmd.AddCommand(clientServiceCmd)
 	clientCmd.PersistentFlags().StringVarP(&email, "email", "e", "", "contact email")
 	clientCmd.PersistentFlags().StringVarP(&password, "password", "p", "", "contact password (min 8 chars)")
 
@@ -231,4 +245,6 @@ func init() {
 	clientMirrorCreateCmd.Flags().StringVarP(&m_storage, "storage", "s", "", "Storage usage limit")
 	clientMirrorCreateCmd.Flags().StringVarP(&m_bandwidth, "bandwidth", "b", "", "Bandwith limit")
 	clientMirrorCreateCmd.Flags().StringVarP(&m_traffic, "traffic", "t", "", "Monthly traffic limit")
+
+	clientServiceCmd.AddCommand(clientServiceListCmd)
 }
