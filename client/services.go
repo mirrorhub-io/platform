@@ -22,3 +22,10 @@ func (c *ServiceClient) List() (*pb.ServiceGetResponse, error) {
 		&pb.ServiceGetRequest{},
 	)
 }
+
+func (c *ServiceClient) Create(s *pb.Service) (*pb.Service, error) {
+	return c.connection().Create(
+		c.Client.Context,
+		s,
+	)
+}

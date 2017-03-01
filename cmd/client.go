@@ -210,6 +210,32 @@ var clientServiceListCmd = &cobra.Command{
 	},
 }
 
+var (
+	s_name    string
+	s_storage string
+)
+
+func serviceFromFlags(files []string) *pb.Service {
+	s := &pb.Service{}
+	if s_name != "" {
+		s.Name = s_name
+	}
+	if s_storage != "" {
+		i, _ := strconv.Atoi(s_storage)
+		s.Storage = int64(i)
+	}
+	s.Files = files
+	return s
+}
+
+var clientServiceCreateCmd = &cobra.Command{
+	Use:   "create",
+	Short: "Create service",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret(c.Service().Create(serviceFromFlags(args)))
+	},
+}
+
 func init() {
 	RootCmd.AddCommand(clientCmd)
 	clientCmd.AddCommand(clientContactCmd)
@@ -247,4 +273,7 @@ func init() {
 	clientMirrorCreateCmd.Flags().StringVarP(&m_traffic, "traffic", "t", "", "Monthly traffic limit")
 
 	clientServiceCmd.AddCommand(clientServiceListCmd)
+	clientServiceCmd.AddCommand(clientServiceCreateCmd)
+	clientServiceCreateCmd.Flags().StringVarP(&s_name, "name", "n", "", "Service's display name")
+	clientServiceCreateCmd.Flags().StringVarP(&s_storage, "storage", "s", "", "Storage requirement")
 }
