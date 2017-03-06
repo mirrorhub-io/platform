@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+
 	"github.com/jinzhu/gorm"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/satori/go.uuid"
@@ -44,6 +45,7 @@ func MirrorFromProto(p *pb.Mirror) *Mirror {
 		IPv6:             p.Ipv6,
 		Domain:           p.Domain,
 		ContactID:        p.ContactId,
+		ServiceID:        p.Service.Id,
 		Traffic:          p.Traffic,
 		Storage:          p.Storage,
 		ClientToken:      p.ClientToken,
@@ -92,11 +94,29 @@ func (m *Mirror) ServiceEndpoint() *Mirror {
 	return mirror
 }
 
+func (m *Mirror) Service() (*Service, error) {
+	se := &Service{}
+	if Connection().Where(
+		"id = ?",
+		m.ServiceID,
+	).First(&se).RecordNotFound() {
+		return nil, errors.New("Record not found.")
+	}
+	return se, nil
+
+}
+
 func (m *Mirror) ToProto(nested ...bool) *pb.Mirror {
 	se := m.ServiceEndpoint()
 	var sep *pb.Mirror
 	if se != nil && len(nested) == 0 {
 		sep = se.ToProto(false)
+	}
+
+	ser, err := m.Service()
+	var serp *pb.Service
+	if err == nil {
+		serp = ser.ToProto()
 	}
 
 	return &pb.Mirror{
@@ -110,6 +130,7 @@ func (m *Mirror) ToProto(nested ...bool) *pb.Mirror {
 		ClientToken:     m.ClientToken,
 		Bandwidth:       m.Bandwidth,
 		Storage:         m.Storage,
+		Service:         serp,
 		CreatedAt:       m.CreatedAt.Unix(),
 		ServiceEndpoint: sep,
 	}

@@ -15,13 +15,14 @@
 package cmd
 
 import (
+	"io/ioutil"
+	"os/user"
+	"strconv"
+
 	"github.com/mirrorhub-io/platform/client"
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"os/user"
-	"strconv"
 )
 
 var (
@@ -125,6 +126,27 @@ var clientMirrorListCmd = &cobra.Command{
 	},
 }
 
+var mirrorConnectTo string
+
+var clientMirrorConnectCmd = &cobra.Command{
+	Use:   "connect",
+	Short: "Connect mirror and mirroring endpoint together",
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) != 1 {
+			exit("Expected MirrorID")
+		}
+		i, err := strconv.Atoi(args[0])
+		if err != nil {
+			exit(err.Error())
+		}
+		endpoint_id, err := strconv.Atoi(mirrorConnectTo)
+		if err != nil {
+			exit(err.Error())
+		}
+		ret(c.Mirror().Connect(int32(i), int32(endpoint_id)))
+	},
+}
+
 var clientMirrorGetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Find mirror by id",
@@ -141,13 +163,14 @@ var clientMirrorGetCmd = &cobra.Command{
 }
 
 var (
-	m_bandwidth string
-	m_domain    string
-	m_ipv4      string
-	m_ipv6      string
-	m_name      string
-	m_storage   string
-	m_traffic   string
+	m_bandwidth  string
+	m_domain     string
+	m_ipv4       string
+	m_ipv6       string
+	m_name       string
+	m_storage    string
+	m_traffic    string
+	m_service_id string
 )
 
 var clientMirrorUpdateCmd = &cobra.Command{
@@ -194,6 +217,12 @@ func mirrorFromFlags() *pb.Mirror {
 	if m_traffic != "" {
 		i, _ := strconv.Atoi(m_traffic)
 		m.Traffic = int64(i)
+	}
+	if m_service_id != "" {
+		i, _ := strconv.Atoi(m_service_id)
+		m.Service = &pb.Service{
+			Id: int32(i),
+		}
 	}
 	if m_bandwidth != "" {
 		i, _ := strconv.Atoi(m_bandwidth)
@@ -253,6 +282,8 @@ func init() {
 
 	clientMirrorCmd.AddCommand(clientMirrorListCmd)
 	clientMirrorCmd.AddCommand(clientMirrorGetCmd)
+	clientMirrorCmd.AddCommand(clientMirrorConnectCmd)
+	clientMirrorConnectCmd.Flags().StringVarP(&mirrorConnectTo, "endpoint-id", "e", "", "The service you want to connect to")
 
 	clientMirrorCmd.AddCommand(clientMirrorUpdateCmd)
 	clientMirrorUpdateCmd.Flags().StringVarP(&m_ipv4, "ipv4", "4", "", "IPv4 address")
@@ -262,6 +293,7 @@ func init() {
 	clientMirrorUpdateCmd.Flags().StringVarP(&m_storage, "storage", "s", "", "Storage usage limit")
 	clientMirrorUpdateCmd.Flags().StringVarP(&m_bandwidth, "bandwidth", "b", "", "Bandwith limit")
 	clientMirrorUpdateCmd.Flags().StringVarP(&m_traffic, "traffic", "t", "", "Monthly traffic limit")
+	clientMirrorUpdateCmd.Flags().StringVarP(&m_service_id, "service-id", "", "", "Service id")
 
 	clientMirrorCmd.AddCommand(clientMirrorCreateCmd)
 	clientMirrorCreateCmd.Flags().StringVarP(&m_ipv4, "ipv4", "4", "", "IPv4 address")
@@ -271,6 +303,7 @@ func init() {
 	clientMirrorCreateCmd.Flags().StringVarP(&m_storage, "storage", "s", "", "Storage usage limit")
 	clientMirrorCreateCmd.Flags().StringVarP(&m_bandwidth, "bandwidth", "b", "", "Bandwith limit")
 	clientMirrorCreateCmd.Flags().StringVarP(&m_traffic, "traffic", "t", "", "Monthly traffic limit")
+	clientMirrorCreateCmd.Flags().StringVarP(&m_service_id, "service-id", "", "", "Service id")
 
 	clientServiceCmd.AddCommand(clientServiceListCmd)
 	clientServiceCmd.AddCommand(clientServiceCreateCmd)

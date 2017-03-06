@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"errors"
+
 	pb "github.com/mirrorhub-io/platform/controllers/proto"
 	"github.com/mirrorhub-io/platform/models"
 	"golang.org/x/net/context"

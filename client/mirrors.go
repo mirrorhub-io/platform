@@ -40,6 +40,16 @@ func (c *MirrorClient) UpdateById(id int32, m *pb.Mirror) (*pb.Mirror, error) {
 	)
 }
 
+func (c *MirrorClient) Connect(id int32, service_id int32) (*pb.Mirror, error) {
+	return c.connection().Connect(
+		c.Client.Context,
+		&pb.ConnectServiceAndMirror{
+			EndpointId: service_id,
+			MirrorId:   id,
+		},
+	)
+}
+
 func (c *MirrorClient) Create(m *pb.Mirror) (*pb.Mirror, error) {
 	return c.connection().Create(
 		c.Client.Context,
