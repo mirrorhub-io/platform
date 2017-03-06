@@ -1,11 +1,12 @@
 package client
 
 import (
+	"log"
+
 	"github.com/spf13/viper"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"log"
 )
 
 type Client struct {
