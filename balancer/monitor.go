@@ -41,10 +41,10 @@ type Monitor struct {
 	Mutex        *sync.Mutex
 }
 
-func NewMonitor() *Monitor {
+func NewMonitor(c *client.Client) *Monitor {
 	l, _ := lru.NewARC(ServiceCacheSize)
 	return &Monitor{
-		Client:       client.Initialize(),
+		Client:       c,
 		Logger:       log.New(os.Stdout, " [Monitor] ", 0),
 		ServiceCache: l,
 		Mutex:        &sync.Mutex{},
@@ -60,6 +60,7 @@ func (m *Monitor) Authorize() error {
 }
 
 func (m *Monitor) Preload() {
+	m.Logger.Println("Preload monitor")
 	if m.Authorize() != nil {
 		return
 	}
@@ -76,11 +77,13 @@ func (m *Monitor) Preload() {
 
 func NewService(s *pb.Service, m *Monitor) *Service {
 	l, _ := lru.NewARC(FileCacheSize)
-	return &Service{
+	ss := &Service{
 		Orig:      s,
 		FileCache: l,
 		Monitor:   m,
 	}
+	ss.Preload()
+	return ss
 }
 
 func (s *Service) Preload() {
@@ -91,4 +94,5 @@ func (s *Service) Preload() {
 			Path:  &file,
 		}
 	}
+	s.Monitor.Logger.Println("Files:", len(files))
 }
