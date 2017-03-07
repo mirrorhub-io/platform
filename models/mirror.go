@@ -39,13 +39,17 @@ func MirrorList(limit int, offset int) *MirrorCollection {
 }
 
 func MirrorFromProto(p *pb.Mirror) *Mirror {
+	var serviceId int32
+	if p.Service != nil {
+		serviceId = p.Service.Id
+	}
 	return &Mirror{
 		Name:             p.Name,
 		IPv4:             p.Ipv4,
 		IPv6:             p.Ipv6,
 		Domain:           p.Domain,
 		ContactID:        p.ContactId,
-		ServiceID:        p.Service.Id,
+		ServiceID:        serviceId,
 		Traffic:          p.Traffic,
 		Storage:          p.Storage,
 		ClientToken:      p.ClientToken,
