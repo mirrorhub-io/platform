@@ -38,18 +38,21 @@ func (c *Client) Connection() *grpc.ClientConn {
 }
 
 func (c *Client) Contact() *ContactClient {
+	c.PrepareHeader()
 	return &ContactClient{
 		Client: c,
 	}
 }
 
 func (c *Client) Mirror() *MirrorClient {
+	c.PrepareHeader()
 	return &MirrorClient{
 		Client: c,
 	}
 }
 
 func (c *Client) Service() *ServiceClient {
+	c.PrepareHeader()
 	return &ServiceClient{
 		Client: c,
 	}
